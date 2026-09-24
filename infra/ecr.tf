@@ -4,7 +4,7 @@
 
 resource "aws_ecr_repository" "app" {
   name                 = var.app_name
-  image_tag_mutability = "IMMUTABLE" # `latest` is re-pushed on every merge
+  image_tag_mutability = "MUTABLE" # `latest` is re-pushed on every merge
   force_delete         = true
 
   image_scanning_configuration {
