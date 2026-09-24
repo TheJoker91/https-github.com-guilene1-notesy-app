@@ -1,0 +1,52 @@
+name: Notesy CI/CD
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+env:
+  # App
+  APP_NAME: ${{ vars.APP_NAME }}
+  CONTAINER_NAME: notesy
+  JAVA_VERSION: "17"
+
+  # AWS
+  AWS_REGION: ${{ vars.AWS_REGION }}
+  ECR_REPOSITORY: ${{ vars.ECR_REPOSITORY }}
+  ECS_CLUSTER: ${{ vars.ECS_CLUSTER }}
+  ECS_SERVICE: ${{ vars.ECS_SERVICE }}
+
+  # JFrog
+  JFROG_URL: ${{ vars.JFROG_URL }}
+  JFROG_REPO: ${{ vars.JFROG_REPO }}
+
+  # SonarCloud
+  SONAR_TOKEN: ${{ vars.SONAR_TOKEN }}
+  SONAR_ORGANIZATION: ${{ vars.SONAR_ORGANIZATION }}
+  SONAR_PROJECT_KEY: ${{ vars.SONAR_PROJECT_KEY }}
+
+  # Vault
+  VAULT_ADDR: ${{ vars.VAULT_ADDR }}
+  VAULT_ROLE: ${{ secrets.VAULT_ROLE }}
+  VAULT_SECRET_ID: ${{ secrets.VAULT_SECRET_ID }}
+  VAULT_JFROG_SECRET_PATH: ${{ vars.VAULT_JFROG_SECRET_PATH }}
+
+jobs:
+  gitleaks:
+    name: Gitleaks Secret Scan
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Run Gitleaks
+        uses: gitleaks/gitleaks-action@v3
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITLEAKS_ENABLE_COMMENTS: "false"
